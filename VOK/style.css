@@ -1,0 +1,199 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #1a1a1a;
+    --surface-color: #2c2c2c;
+    --text-color: #f1f1f1;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 1rem;
+}
+
+#app {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+h1, h2 {
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.player-list {
+    list-style: none;
+    padding: 0;
+    display: flex; /* Use flexbox for player rows */
+    flex-wrap: wrap; /* Allow items to wrap to next line */
+    gap: 10px; /* Space between player items */
+    justify-content: center; /* Center items horizontally */
+}
+
+.player-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--surface-color);
+    padding: 0.5rem 0.5rem;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    width: 85px;
+    height: 85px;
+    text-align: center;
+    position: relative;
+    border: 1px solid white;
+}
+
+.player-item.selected {
+    background-color: var(--primary-color);
+}
+
+.player-item span {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.player-item small {
+    font-size: 0.7rem;
+    color: #ccc;
+}
+
+.player-item small span {
+    font-size: 1.2rem; /* Increased font size for timer numbers */
+}
+
+/* Specific rule for half-time timer */
+.player-item small span[id^="player-half-time-"] {
+    font-size: 0.9rem; /* Smaller font size for half-time timer */
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    box-sizing: border-box;
+}
+
+.actions {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+#matchTimer {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: yellow;
+}
+
+/* Rotation timer */
+.player-item small span[id^="player-rotation-time-"] {
+    color: #00FF00; /* Fluorescent green */
+}
+
+.removePlayerBtn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+.ejectPlayerBtn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    font-size: 0.6rem;
+    line-height: 1;
+    padding: 0;
+}
+
+.player-containers {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 1.5rem;
+}
+
+.on-court-container, .substitutes-container {
+    background-color: var(--surface-color);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.on-court-container h3, .substitutes-container h3 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-top: 0;
+}
+
+.player-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--primary-color);
+}
+
+.player-item.drag-over {
+    border: 2px solid var(--success-color);
+    box-shadow: 0 0 10px var(--success-color);
+}
