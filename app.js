@@ -129,7 +129,7 @@ const App = {
             <ul class="player-list" id="playerList">
                 ${players.sort((a,b) => a.dorsal - b.dorsal).map(player => `
                     <li class="player-item" data-id="${player.id}">
-                        <span>${player.dorsal} - ${player.name}</span>
+                        <span>${player.name}</span>
                         <button class="btn btn-danger deletePlayerBtn">Eliminar</button>
                     </li>
                 `).join('')}
@@ -201,7 +201,7 @@ const App = {
             <ul class="player-list" id="playerSelectionList">
                 ${players.sort((a,b) => a.dorsal - b.dorsal).map(player => `
                     <li class="player-item" data-id="${player.id}">
-                        <span>${player.dorsal} - ${player.name}</span>
+                        <span>${player.name}</span>
                         <input type="checkbox" class="player-checkbox">
                     </li>
                 `).join('')}
@@ -323,8 +323,8 @@ const App = {
             <ul class="player-list">
                 ${playersWithTime.sort((a, b) => b.totalTime - a.totalTime).map(player => `
                     <li class="player-item">
-                        <span>${player.dorsal} - ${player.name}${player.ejectedStatus}</span>
-                        <small>Total Partido: ${App.formatTime(player.totalTime)}</small>
+                        <span>${player.name}${player.ejectedStatus}</span>
+                        <small>Total: ${App.formatTime(player.totalTime)}</small>
                         <small>1ª Parte: ${App.formatTime(player.half1Time)}</small>
                         <small>2ª Parte: ${App.formatTime(player.half2Time)}</small>
                     </li>
