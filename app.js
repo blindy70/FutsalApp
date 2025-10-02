@@ -372,7 +372,7 @@ const App = {
                     <ul class="player-list" id="substituteList">
                         ${substitutes.map(player => `
                             <li class="player-item" data-id="${player.id}" draggable="true">
-                                <span>${player.dorsal} - ${player.name}</span>
+                                <span>${player.name}</span>
                                 <small><span id="player-rotation-time-${player.id}">${App.formatTime(App.playerTimers[player.id].currentRotationTime)}</span></small>
                                 <small><span id="player-half-time-${player.id}">${App.formatTime(App.currentHalf === 1 ? App.playerTimers[player.id].halfTimes[App.currentHalf] : App.playerTimers[player.id].totalTime)}</span></small>
                                 <button class="btn btn-danger ejectPlayerBtn">X</button>
@@ -630,7 +630,7 @@ const App = {
                     const proratedTime = prorate ? Math.round((playedTime / halfDuration) * 1200) : playedTime;
                     return `
                     <li class="player-item">
-                        <span>${player.dorsal} - ${player.name}${player.ejectedStatus}</span>
+                        <span>${player.name}${player.ejectedStatus}</span>
                         <small>Tiempo en 1ª Parte: ${App.formatTime(proratedTime)}</small>
                     </li>
                 `}).join('')}
