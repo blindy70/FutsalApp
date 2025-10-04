@@ -18,30 +18,29 @@ const App = {
             localStorage.setItem('futsal_report_queue', JSON.stringify(queue));
         },
         sendMatchReport: (reportData) => {
-            const payload = {
+            const payload = JSON.stringify({
                 action: 'saveMatchReport',
                 payload: reportData
-            };
+            });
 
-            const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=utf-8' });
+            const url = new URL(App.googleSheetUrl);
+            url.searchParams.append('payload', payload);
 
             try {
-                if (navigator.sendBeacon(App.googleSheetUrl, blob)) {
-                    // Beacon was successfully queued.
-                    // We can optimistically remove the report from the queue.
-                    const queue = App.DB.getReportQueue();
-                    queue.shift();
-                    App.DB.saveReportQueue(queue);
-                    App.updateSyncStatus();
-                } else {
-                    // Beacon failed to queue. The report remains in the queue.
-                    // We can try again later.
-                    console.error('Failed to queue beacon. Report remains in queue.');
-                    alert('No se pudo poner en cola el envío del informe. Se reintentará más tarde.');
-                }
+                fetch(url, {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    keepalive: true
+                });
+
+                // Optimistically remove the report from the queue
+                const queue = App.DB.getReportQueue();
+                queue.shift();
+                App.DB.saveReportQueue(queue);
+                App.updateSyncStatus();
+
             } catch (e) {
-                // This can happen if the data is too large.
-                console.error('Error sending beacon:', e);
+                console.error('Error sending report with fetch:', e);
                 alert('Error al enviar el informe: ' + e.message);
             }
         }
