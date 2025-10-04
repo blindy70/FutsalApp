@@ -18,28 +18,32 @@ const App = {
             localStorage.setItem('futsal_report_queue', JSON.stringify(queue));
         },
         sendMatchReport: (reportData) => {
-            const script = document.createElement('script');
-            const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-            window[callbackName] = function(data) {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                if (data.result === 'success') {
+            const payload = {
+                action: 'saveMatchReport',
+                payload: reportData
+            };
+
+            const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=utf-8' });
+
+            try {
+                if (navigator.sendBeacon(App.googleSheetUrl, blob)) {
+                    // Beacon was successfully queued.
+                    // We can optimistically remove the report from the queue.
                     const queue = App.DB.getReportQueue();
                     queue.shift();
                     App.DB.saveReportQueue(queue);
                     App.updateSyncStatus();
                 } else {
-                    alert('No se pudo sincronizar el informe. Revisa tu conexión e inténtalo de nuevo.');
+                    // Beacon failed to queue. The report remains in the queue.
+                    // We can try again later.
+                    console.error('Failed to queue beacon. Report remains in queue.');
+                    alert('No se pudo poner en cola el envío del informe. Se reintentará más tarde.');
                 }
-            };
-
-            const payload = JSON.stringify({
-                action: 'saveMatchReport',
-                payload: reportData
-            });
-
-            script.src = App.googleSheetUrl + '?callback=' + callbackName + '&payload=' + encodeURIComponent(payload);
-            document.body.appendChild(script);
+            } catch (e) {
+                // This can happen if the data is too large.
+                console.error('Error sending beacon:', e);
+                alert('Error al enviar el informe: ' + e.message);
+            }
         }
     },
 
