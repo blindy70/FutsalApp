@@ -99,7 +99,6 @@ const App = {
         appContainer.innerHTML = `
             <h2>Gestor de Tiempo de Juego</h2>
             <div class="actions">
-                <button class="btn" id="goToTeamManagementBtn">Mi Equipo</button>
                 <button class="btn" id="goToNewMatchBtn">Nuevo Partido</button>
             </div>
             <div class="sync-container">
@@ -107,69 +106,28 @@ const App = {
                 <button class="btn btn-secondary" id="syncBtn">Sincronizar Manualmente</button>
             </div>
         `;
-        document.getElementById('goToTeamManagementBtn').addEventListener('click', App.renderTeamManagementPage);
         document.getElementById('goToNewMatchBtn').addEventListener('click', App.renderNewMatchPage);
         document.getElementById('syncBtn').addEventListener('click', App.processReportQueue);
         App.updateSyncStatus();
     },
 
-    renderTeamManagementPage: () => {
-        const appContainer = document.getElementById('app');
-        const players = App.DB.getPlayers();
-        const html = `
-            <h2>Mi Equipo</h2>
-            <div class="form-group">
-                <label for="playerName">Nombre del Jugador</label>
-                <input type="text" id="playerName" placeholder="Ej: Juan Pérez">
-            </div>
-            <div class="form-group">
-                <label for="playerDorsal">Dorsal</label>
-                <input type="number" id="playerDorsal" placeholder="Ej: 10">
-            </div>
-            <div class="actions">
-                <button class="btn btn-success" id="addPlayerBtn">Añadir Jugador</button>
-            </div>
-            <ul class="player-list" id="playerList">
-                ${players.sort((a,b) => a.dorsal - b.dorsal).map(player => `
-                    <li class="player-item" data-id="${player.id}">
-                        <span>${player.name}</span>
-                        <button class="btn btn-danger deletePlayerBtn">Eliminar</button>
-                    </li>
-                `).join('')}
-            </ul>
-            <div class="actions">
-                <button class="btn" id="backToHomeBtn">Volver al Inicio</button>
-                <button class="btn" id="goToNewMatchBtn">Ir a Nuevo Partido</button>
-            </div>
-        `;
-        appContainer.innerHTML = html;
 
-        document.getElementById('addPlayerBtn').addEventListener('click', App.addPlayer);
-        document.querySelectorAll('.deletePlayerBtn').forEach(btn => {
-            btn.addEventListener('click', App.deletePlayer);
-        });
-        document.getElementById('goToNewMatchBtn').addEventListener('click', App.renderNewMatchPage);
-        document.getElementById('backToHomeBtn').addEventListener('click', App.renderHomePage);
-    },
 
     addPlayer: () => {
         const nameInput = document.getElementById('playerName');
-        const dorsalInput = document.getElementById('playerDorsal');
         const name = nameInput.value.trim();
-        const dorsal = parseInt(dorsalInput.value);
 
-        if (name && dorsal) {
+        if (name) {
             const players = App.DB.getPlayers();
             const newPlayer = {
                 id: Date.now(),
-                name: name,
-                dorsal: dorsal
+                name: name
             };
             players.push(newPlayer);
             App.DB.savePlayers(players);
-            App.renderTeamManagementPage();
+            App.renderNewMatchPage();
         } else {
-            alert('Por favor, introduce un nombre y un dorsal válidos.');
+            alert('Por favor, introduce un nombre válido.');
         }
     },
 
@@ -180,7 +138,7 @@ const App = {
             let players = App.DB.getPlayers();
             players = players.filter(p => p.id !== playerId);
             App.DB.savePlayers(players);
-            App.renderTeamManagementPage();
+            App.renderNewMatchPage();
         }
     },
 
@@ -188,27 +146,31 @@ const App = {
         const appContainer = document.getElementById('app');
         const players = App.DB.getPlayers();
 
-        if (players.length < 5) {
-            alert('Debes tener al menos 5 jugadores en tu equipo para empezar un partido.');
-            App.renderTeamManagementPage();
-            return;
-        }
-
         const html = `
             <h2>Nuevo Partido</h2>
             <div class="form-group">
                 <label for="opponentName">Nombre del Rival</label>
                 <input type="text" id="opponentName" placeholder="Ej: Equipo B" required>
             </div>
-            <h3>Selecciona los jugadores para el partido (5 titulares, hasta 12 en total)</h3>
+
+            <h3>Jugadores</h3>
+            <div class="form-group">
+                <label for="playerName">Nombre del Jugador</label>
+                <input type="text" id="playerName" placeholder="Ej: Juan Pérez">
+                <button class="btn btn-success" id="addPlayerBtn">Añadir</button>
+            </div>
             <ul class="player-list" id="playerSelectionList">
-                ${players.sort((a,b) => a.dorsal - b.dorsal).map(player => `
+                ${players.sort((a,b) => a.name.localeCompare(b.name)).map(player => `
                     <li class="player-item" data-id="${player.id}">
                         <span>${player.name}</span>
-                        <input type="checkbox" class="player-checkbox">
+                        <div>
+                            <input type="checkbox" class="player-checkbox">
+                            <button class="btn btn-danger deletePlayerBtn">Eliminar</button>
+                        </div>
                     </li>
                 `).join('')}
             </ul>
+
             <div class="actions">
                 <button class="btn btn-success" id="startMatchBtn">Empezar Partido</button>
                 <button class="btn btn-secondary" id="backToHomeBtn">Volver al Inicio</button>
@@ -217,6 +179,10 @@ const App = {
 
         appContainer.innerHTML = html;
 
+        document.getElementById('addPlayerBtn').addEventListener('click', App.addPlayer);
+        document.querySelectorAll('.deletePlayerBtn').forEach(btn => {
+            btn.addEventListener('click', App.deletePlayer);
+        });
         document.getElementById('startMatchBtn').addEventListener('click', App.startMatch);
         document.getElementById('backToHomeBtn').addEventListener('click', App.renderHomePage);
     },
@@ -303,11 +269,10 @@ const App = {
             matchID: App.matchID,
             opponent: App.opponentName,
             players: playersWithTime.map(p => ({
-                dorsal: p.dorsal,
                 name: p.name,
-                totalTime: p.totalTime,
-                half1Time: p.half1Time,
-                half2Time: p.half2Time,
+                totalTime: App.formatTime(p.totalTime),
+                half1Time: App.formatTime(p.half1Time),
+                half2Time: App.formatTime(p.half2Time),
                 ejected: p.ejected
             }))
         };
